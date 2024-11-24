@@ -1,0 +1,12 @@
+# Ignorar dependencias
+node_modules/
+
+# Ignorar archivos generados para producción
+dist/
+
+# Ignorar configuraciones locales
+.env
+.env.*
+
+# Ignorar logs y otros archivos temporales
+*.log

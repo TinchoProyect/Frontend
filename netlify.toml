@@ -1,0 +1,14 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[dev]
+  command = "npm run dev"
+  port = 3002
+
+[[redirects]]
+  from = "/api/*"
+  to = "http://1.tcp.sa.ngrok.io:20186/:splat"
+  status = 200
+  force = true
+  headers = {X-From = "Netlify"}
