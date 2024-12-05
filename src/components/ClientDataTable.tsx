@@ -21,10 +21,7 @@ export const ClientDataTable: React.FC<Props> = ({ data }) => {
   };
 
   const formatMonto = (monto: number, isTotal: boolean = false): string => {
-    // Round small values to zero
     const roundedMonto = Math.abs(monto) < 0.99 ? 0 : monto;
-    
-    // For total balance, always use absolute value
     const displayMonto = isTotal ? Math.abs(roundedMonto) : roundedMonto;
 
     return new Intl.NumberFormat('es-AR', {
@@ -58,8 +55,7 @@ export const ClientDataTable: React.FC<Props> = ({ data }) => {
     };
   };
 
-  // Get final balance from the most recent movement or saldo inicial
-  const saldoActual = data.movimientos?.[0]?.saldoAcumulado ?? data.saldoInicial?.monto ?? 0;
+  const saldoActual = data.movimientos?.[0]?.saldoAcumulado ?? data.saldoInicial?.Monto ?? 0; // Clave ajustada
 
   if (!data.movimientos?.length) {
     return (
@@ -141,8 +137,8 @@ export const ClientDataTable: React.FC<Props> = ({ data }) => {
         <div className="mt-4 p-4 bg-gray-50 rounded-lg">
           <p className="text-sm text-gray-600">
             <span className="font-medium">Saldo Inicial:</span>{' '}
-            <span>{formatMonto(data.saldoInicial.monto)}</span>
-            <span className="text-gray-500 ml-2">({data.saldoInicial.fecha})</span>
+            <span>{formatMonto(data.saldoInicial.Monto)}</span>{' '} {/* Clave ajustada */}
+            <span className="text-gray-500 ml-2">({data.saldoInicial.Fecha})</span> {/* Clave ajustada */}
           </p>
         </div>
       )}

@@ -1,18 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { SaldoInicial } from '../types/client';
+import { saldoInicialService } from '../services/saldoInicial'; // Asegúrate de importar el servicio correctamente
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (saldo: SaldoInicial) => void;
+  onSave: (saldo: SaldoInicial) => Promise<void>;
+  clienteId: string | null; // Permitir null si es necesario
   saldoActual: SaldoInicial | null;
 }
 
 const formatearMonto = (valor: number): string => {
   return valor.toLocaleString('es-AR', {
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   });
 };
 
@@ -23,8 +25,8 @@ const formatearFecha = (fecha: string): string => {
 export const SaldoInicialModal: React.FC<Props> = ({
   isOpen,
   onClose,
-  onSave,
-  saldoActual
+  clienteId,
+  saldoActual,
 }) => {
   const [monto, setMonto] = useState('');
   const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
@@ -46,9 +48,9 @@ export const SaldoInicialModal: React.FC<Props> = ({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!monto.trim()) {
       setError('Por favor, ingrese un monto');
       return;
@@ -62,13 +64,28 @@ export const SaldoInicialModal: React.FC<Props> = ({
     const valorNumerico = parseFloat(monto.replace(/[.,]/g, '')) / 100;
     const montoFinal = esNegativo ? -Math.abs(valorNumerico) : Math.abs(valorNumerico);
 
-    onSave({
+    const nuevoSaldo: SaldoInicial = {
       monto: montoFinal,
       fecha: fecha,
-      ultimaModificacion: new Date().toISOString()
+      ultimaModificacion: new Date().toISOString(),
+    };
+
+    // Agregar console.log para verificar los datos enviados
+    console.log('Datos a enviar al servicio guardarSaldoInicial:', {
+      clienteId,
+      nuevoSaldo
     });
-    
-    onClose();
+
+    try {
+      const service = new saldoInicialService();
+      await service.guardarSaldoInicial(clienteId, nuevoSaldo);
+
+      console.info('Saldo inicial guardado exitosamente:', nuevoSaldo);
+      onClose(); // Cerrar el modal después de guardar
+    } catch (error) {
+      console.error('Error al guardar el saldo inicial:', error);
+      setError('No se pudo guardar el saldo inicial. Intente nuevamente.');
+    }
   };
 
   const handleMontoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -146,9 +163,7 @@ export const SaldoInicialModal: React.FC<Props> = ({
             />
           </div>
 
-          {error && (
-            <p className="text-sm text-red-600">{error}</p>
-          )}
+          {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div className="flex justify-end gap-3 mt-6">
             <button

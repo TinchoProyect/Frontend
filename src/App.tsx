@@ -16,7 +16,7 @@ function App() {
   const [clienteId, setClienteId] = useState<string | null>(null);
   const [modalSaldoInicial, setModalSaldoInicial] = useState(false);
   const [shouldFetchData, setShouldFetchData] = useState(false);
-  
+
   const { 
     data: clientData,
     isLoading,
@@ -26,13 +26,13 @@ function App() {
 
   const handleClienteSelect = useCallback((id: string) => {
     setClienteId(id || null);
-    setShouldFetchData(false); // Reset data fetching flag when client changes
+    setShouldFetchData(false); // Detenemos la búsqueda hasta que se haga explícitamente
   }, []);
 
   const handleConsultarMovimientos = useCallback(() => {
     if (!clienteId) return;
-    setShouldFetchData(true);
-    refetch();
+    setShouldFetchData(true); // Activamos la consulta de datos
+    refetch(); // Refrescamos los datos
   }, [clienteId, refetch]);
 
   const handleSaldoInicialSave = useCallback(async (saldo: SaldoInicial) => {
@@ -40,10 +40,10 @@ function App() {
       if (!clienteId) {
         throw new Error('No hay cliente seleccionado');
       }
-      
-      await saldoService.guardarSaldoInicial(clienteId, saldo);
+
+      await saldoService.guardarSaldoInicial(clienteId, saldo); // Guardamos el saldo inicial
       if (shouldFetchData) {
-        refetch();
+        refetch(); // Actualizamos la tabla si corresponde
       }
 
       console.info('Saldo inicial guardado:', {
@@ -52,12 +52,12 @@ function App() {
       });
     } catch (error) {
       console.error('Error al guardar saldo inicial:', error);
-      throw new Error('Error al guardar el saldo inicial');
+      alert('Error al guardar el saldo inicial. Por favor, intente nuevamente.');
     }
   }, [clienteId, refetch, shouldFetchData]);
 
   const handleModalClose = useCallback(() => {
-    setModalSaldoInicial(false);
+    setModalSaldoInicial(false); // Cerramos el modal
   }, []);
 
   return (
@@ -81,14 +81,14 @@ function App() {
             <div className="space-y-6">
               <ClienteSearch 
                 onClienteSelect={handleClienteSelect}
-                disabled={isLoading}
+                disabled={isLoading} // Desactivamos la búsqueda si está cargando
               />
 
               {clienteId && (
                 <div className="flex flex-wrap gap-3">
                   <button
                     type="button"
-                    onClick={() => setModalSaldoInicial(true)}
+                    onClick={() => setModalSaldoInicial(true)} // Abrir modal de saldo inicial
                     className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 flex items-center gap-2 text-sm"
                   >
                     <Wallet className="w-4 h-4" />
@@ -97,7 +97,7 @@ function App() {
 
                   <button
                     type="button"
-                    onClick={handleConsultarMovimientos}
+                    onClick={handleConsultarMovimientos} // Consultar movimientos del cliente
                     disabled={isLoading}
                     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300 flex items-center gap-2 text-sm"
                   >
@@ -146,7 +146,8 @@ function App() {
         isOpen={modalSaldoInicial}
         onClose={handleModalClose}
         onSave={handleSaldoInicialSave}
-        saldoActual={clientData?.saldoInicial || null}
+        clienteId={clienteId} // Garantizamos que clienteId sea string
+        saldoActual={clientData?.saldoInicial || null} // Validamos saldo inicial
       />
     </div>
   );

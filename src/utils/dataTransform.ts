@@ -140,9 +140,9 @@ export const exportToExcel = async (data: ProcessedClientData): Promise<Blob> =>
     worksheet.addRow([
       'Saldo Inicial',
       '',
-      formatCurrency(data.saldoInicial.monto),
+      formatCurrency(data.saldoInicial.Monto), // Ajustado a la clave 'Monto'
       '',
-      `(${data.saldoInicial.fecha})`
+      `(${data.saldoInicial.Fecha})` // Ajustado a la clave 'Fecha'
     ]).font = { italic: true };
   }
 

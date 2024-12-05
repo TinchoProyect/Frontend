@@ -24,13 +24,17 @@ export const useClientData = (clienteId: string | null, enabled: boolean = false
         // Calculate balances with saldo inicial
         const movimientosConSaldo = calculateBalances(
           processedMovements,
-          saldoInicial?.monto || 0
+          saldoInicial?.Monto || 0 // Cambiado de 'monto' a 'Monto'
         );
 
         return {
           clienteId,
           movimientos: movimientosConSaldo,
-          saldoInicial,
+          saldoInicial: {
+            monto: saldoInicial?.Monto || 0, // Asegura que la clave coincida con el backend
+            fecha: saldoInicial?.Fecha || null, // Asegura que la clave coincida
+            ultimaModificacion: saldoInicial?.UltimaModificacion || null // Asegura que la clave coincida
+          },
           fromCache: movimientosResponse.fromCache,
           lastUpdate: movimientosResponse.lastUpdate
         };
